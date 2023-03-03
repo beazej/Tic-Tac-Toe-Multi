@@ -2,7 +2,7 @@ import socket
 from _thread import *
 import pickle
 from game import Game
-from constants import *
+from settings import *
 
 server = SERVER_IP
 port = SERVER_PORT
@@ -47,8 +47,17 @@ def threaded_client(conn, p, gameId):
                         game.ties += 1
                     elif data == "win":
                         game.wins[p] += 1
+                    elif data == "choosed":
+                        game.choose[p] = True
+                    elif data == "notchoosed":
+                        game.choose[p] = False
                     elif data != "get":
-                        game.play(p, data)
+                        if data[0] == 'C':
+                            game.setColor(p, data[1:])
+                        elif data[0] == 'M':
+                            game.marks[p] = data[1]
+                        else:
+                            game.play(p, data)
 
                     conn.sendall(pickle.dumps(game))
             else:
