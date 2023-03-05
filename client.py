@@ -5,7 +5,7 @@ from constants import *
 
 pygame.font.init()
 
-WIDTH = 800
+WIDTH = 850
 HEIGHT = 800
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Client")
@@ -16,7 +16,7 @@ class Button:
     def __init__(self, i, j, n):
         self.n = n
         self.color = BGCOLOR
-        self.size = (WIDTH - 200)//self.n
+        self.size = (WIDTH - 250)//self.n
         self.x = 50 + i*self.size
         self.y = 100 + j*self.size
         self.coor = [i, j]
@@ -24,7 +24,7 @@ class Button:
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.size, self.size))
-        pygame.draw.rect(win, (0, 0, 0), (self.x, self.y, self.size, self.size), 1)
+        pygame.draw.rect(win, (0, 0, 0), (self.x, self.y, self.size, self.size), 1, 5)
 
     def border(self, win, color=(0, 0, 0)):
         pygame.draw.rect(win, color, (self.x, self.y, self.size, self.size), 5)
@@ -32,7 +32,9 @@ class Button:
     def mark(self, win, mark, color):
         font = pygame.font.SysFont("comicsans", self.size)
         text = font.render(mark, 1, color)
-        win.blit(text, (self.x + self.size//4, self.y + self.size//4))
+        text_rect = text.get_rect(center=(self.x + self.size//2, self.y + self.size//2))
+        #win.blit(text, (self.x + self.size//4, self.y + self.size//4))
+        win.blit(text, text_rect)
         self.sign = mark
 
     def click(self, pos):
@@ -345,8 +347,7 @@ def menu_screen():
     while run:
         clock.tick(60)
         win.fill(BGCOLOR)
-        font = pygame.font.SysFont("comicsans", 60)
-        text = font.render("Kliknij by zagrać!", 1, (255,0,0))
+        text = FONT.render("Kliknij by zagrać!", 1, (255,0,0))
         win.blit(text, (100,200))
         pygame.display.update()
 
