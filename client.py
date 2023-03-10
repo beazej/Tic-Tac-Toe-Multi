@@ -33,7 +33,6 @@ class Button:
         font = pygame.font.SysFont("comicsans", self.size)
         text = font.render(mark, 1, color)
         text_rect = text.get_rect(center=(self.x + self.size//2, self.y + self.size//2))
-        #win.blit(text, (self.x + self.size//4, self.y + self.size//4))
         win.blit(text, text_rect)
         self.sign = mark
 
@@ -47,6 +46,33 @@ class Button:
 
     def print(self):
         return str(self.coor[0]).zfill(2) + str(self.coor[1]).zfill(2)
+
+class LongButton:
+    def __init__(self, x, y, width, height):
+        self.color = BGCOLOR
+        self.height = height
+        self.width = width
+        self.x = x
+        self.y = y
+
+    def click(self, pos):
+        x1 = pos[0]
+        y1 = pos[1]
+        if self.x <= x1 <= self.x + self.width and self.y <= y1 <= self.y + self.height:
+            return True
+        else:
+            return False
+
+    def draw(self, win):
+        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(win, (0, 0, 0), (self.x, self.y, self.width, self.height), 1, 5)
+    
+    def write(self, win, string, color):
+        font = pygame.font.SysFont("comicsans", self.height)
+        text = font.render(string, 1, color)
+        text_rect = text.get_rect(center=(self.x + self.width//2, self.y + self.height//2))
+        win.blit(text, text_rect)
+        
 
 class Slider:
     def __init__(self, i, value, letter):
@@ -150,6 +176,7 @@ def main():
     n = Network()
     started = False
     moved = False
+    prevPlayer = 0
     finished = False
     reset = False
     try:
@@ -249,13 +276,14 @@ def main():
         elif not finished:
             aPlayer = game.activePlayer()
             drawSidebar(win, game, aPlayer)
-            if not moved and aPlayer == player:
+            if not moved and aPlayer != prevPlayer:
                 coor = game.getCoor()
                 if coor != []:
-                    btns[3*coor[0] + coor[1]].mark(win, game.marks[(player - 1)%2], game.colors[(player - 1)%2])
+                    btns[3*coor[0] + coor[1]].mark(win, game.marks[prevPlayer], game.colors[prevPlayer])
                 moved = True
-            if moved and game.activePlayer() != player:
+            if moved and aPlayer == prevPlayer:
                 moved = False
+            prevPlayer = aPlayer
             pygame.draw.rect(win, BGCOLOR, (50, 50, 500, 50))
             if aPlayer == player:
                 text = FONT.render("Twój ruch!", 1, COMCOLOR)
@@ -322,7 +350,7 @@ def main():
         elif not game.continued():
             win.fill(BGCOLOR)
             font = pygame.font.SysFont("comicsans", 80)
-            text = font.render("Czekasz na gracza " + str((player + 1)%2), 1, (255,0,0))
+            text = font.render("Czekasz na resztę graczy", 1, (255,0,0))
             win.blit(text, (WIDTH/2 - text.get_width()/2, HEIGHT/2 - text.get_height()/2))
             pygame.display.update()
             for event in pygame.event.get():
@@ -343,12 +371,19 @@ def menu_screen():
     global RUN
     run = True
     clock = pygame.time.Clock()
+    nButton = LongButton(WIDTH//2 - 50, HEIGHT//2 - 25, 200, 50)
+    sButton = LongButton(WIDTH//2 - 50, HEIGHT//2 + 75, 200, 50)
+    
 
     while run:
         clock.tick(60)
         win.fill(BGCOLOR)
         text = FONT.render("Kliknij by zagrać!", 1, (255,0,0))
         win.blit(text, (100,200))
+        #nButton.draw(win)
+        #sButton.draw(win)
+        #nButton.write(win, "Stwórz nową grę", COMCOLOR)
+        #sButton.write(win, "Znajdź grę", COMCOLOR)
         pygame.display.update()
 
         for event in pygame.event.get():
@@ -358,6 +393,11 @@ def menu_screen():
                 RUN = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 run = False
+                pos = pygame.mouse.get_pos()
+                #if nButton.click(pos):
+                 #   print("New")
+                #if sButton.click(pos):
+                  #  print("search")
     if RUN:
         main()
 
