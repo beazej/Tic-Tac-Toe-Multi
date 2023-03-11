@@ -2,122 +2,17 @@ import pygame
 from network import Network
 import pickle
 from constants import *
+from button import Button as LongButton
+from square_button import SquareButton as Button
+from slider import Slider
 
 pygame.font.init()
 
-WIDTH = 850
-HEIGHT = 800
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Client")
 RUN = True
-FONT = pygame.font.SysFont("comicsans", 50)
+FONT = pygame.font.SysFont(FONT_NAME, FONT_SIZE)
 
-class Button:
-    def __init__(self, i, j, n):
-        self.n = n
-        self.color = BGCOLOR
-        self.size = (WIDTH - 250)//self.n
-        self.x = 50 + i*self.size
-        self.y = 100 + j*self.size
-        self.coor = [i, j]
-        self.sign = ''
-
-    def draw(self, win):
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.size, self.size))
-        pygame.draw.rect(win, (0, 0, 0), (self.x, self.y, self.size, self.size), 1, 5)
-
-    def border(self, win, color=(0, 0, 0)):
-        pygame.draw.rect(win, color, (self.x, self.y, self.size, self.size), 5)
-
-    def mark(self, win, mark, color):
-        font = pygame.font.SysFont("comicsans", self.size)
-        text = font.render(mark, 1, color)
-        text_rect = text.get_rect(center=(self.x + self.size//2, self.y + self.size//2))
-        win.blit(text, text_rect)
-        self.sign = mark
-
-    def click(self, pos):
-        x1 = pos[0]
-        y1 = pos[1]
-        if self.x <= x1 <= self.x + self.size and self.y <= y1 <= self.y + self.size:
-            return True
-        else:
-            return False
-
-    def print(self):
-        return str(self.coor[0]).zfill(2) + str(self.coor[1]).zfill(2)
-
-class LongButton:
-    def __init__(self, x, y, width, height):
-        self.color = BGCOLOR
-        self.height = height
-        self.width = width
-        self.x = x
-        self.y = y
-
-    def click(self, pos):
-        x1 = pos[0]
-        y1 = pos[1]
-        if self.x <= x1 <= self.x + self.width and self.y <= y1 <= self.y + self.height:
-            return True
-        else:
-            return False
-
-    def draw(self, win):
-        pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
-        pygame.draw.rect(win, (0, 0, 0), (self.x, self.y, self.width, self.height), 1, 5)
-    
-    def write(self, win, string, color):
-        font = pygame.font.SysFont("comicsans", self.height)
-        text = font.render(string, 1, color)
-        text_rect = text.get_rect(center=(self.x + self.width//2, self.y + self.height//2))
-        win.blit(text, text_rect)
-        
-
-class Slider:
-    def __init__(self, i, value, letter):
-        self.buttonDown = Button(2, 2*i + 6, 15)
-        self.buttonUp = Button(12, 2*i + 6, 15)
-        self.color = tuple([255 if j == i else 0 for j in range(3)])
-        self.letter = letter
-        self.value = value
-        self.width = 512
-        self.thick = 5
-        self.tagHeight = 30
-        self.tagWidth = 4
-        self.x = 88
-        self.y = 400 + i*80
-
-    def draw(self, win):
-        pygame.draw.line(win, (0, 0, 0), (self.x, self.y), (self.x + self.width, self.y), self.thick)
-        pygame.draw.rect(win, self.color, (self.x - 1 + 2*self.value, self.y - self.tagHeight//2, self.tagWidth, self.tagHeight))
-        text = FONT.render(self.letter, 1, self.color)
-        win.blit(text, (50, self.y - 15))
-        text = FONT.render(str(self.value), 1, (0, 0, 0))
-        win.blit(text, (300, self.y - 60))
-        self.buttonDown.draw(win)
-        self.buttonUp.draw(win)
-        self.buttonDown.mark(win, '-', self.color)
-        self.buttonUp.mark(win, '+', self.color)
-
-    def click(self, pos):
-        x1 = pos[0]
-        y1 = pos[1]
-        if self.buttonUp.click(pos):
-            if self.value < 255:
-                self.value += 1
-                return True
-        if self.buttonDown.click(pos):
-            if self.value > 0:
-                self.value -= 1
-                return True
-        elif self.x <= x1 < self.x + self.width and self.y - self.tagHeight//2 <= y1 <= self.y + self.tagHeight//2:
-            self.value = (x1 - self.x)//2
-            return True
-        return False
-
-    def print(self):
-        return str(self.value).zfill(3)
 
 def makeBoard(win, p, results):
     win.fill(BGCOLOR)
@@ -137,24 +32,6 @@ def drawSelectMark(win, color):
         btns[i].draw(win)
         btns[i].mark(win, MARKS[i], color)
     return btns
-
-def drawSelectColor(win, rgb):
-    colors = [(255, 0 ,0), (0, 255, 0), (0, 0, 255)]
-    L = 'RGB'
-    colorBtns = [[Button(10*i + 2, 2*j + 6, 15) for i in range(2)] for j in range(3)]
-    for i in range(3):
-        pygame.draw.line(win, (0, 0, 0), (88, 400 + 80*i), (600, 400 + 80*i), 5)
-        pygame.draw.rect(win, colors[i], (87 + 2*rgb[i], 385 + 80*i, 4, 30))
-        text = FONT.render(L[i], 1, colors[i])
-        win.blit(text, (50, 385 + 80*i))
-        text = FONT.render(str(rgb[i]), 1, (0, 0, 0))
-        win.blit(text, (300, 340 + 80*i))
-        colorBtns[i][0].draw(win)
-        colorBtns[i][0].mark(win, '<', colors[i])
-        colorBtns[i][1].draw(win)
-        colorBtns[i][1].mark(win, '>', colors[i])
-    return colorBtns
-
 
 def drawSidebar(win, game, player=-1):
     btns = [[Button(13 + i, j, 12) for i in range(2)] for j in range(game.players)]
