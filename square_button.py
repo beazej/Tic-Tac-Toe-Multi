@@ -4,12 +4,13 @@ import pygame
 
 class SquareButton (Button):
     def __init__(self, i, j, n):
-        self.size = (WIDTH - XMARGIN - SIDE_WIDTH)//n
+        self.size = (BOARD_SIZE)//n
         super().__init__(XMARGIN + i*self.size, YMARGIN + j*self.size, self.size, self.size)
+        self.color = BOARD_BUTTON_COLOR
         self.coor = [i, j]
         self.sign = ''
 
-    def border(self, win, color=(0, 0, 0)):
+    def border(self, win, color=BLACK):
         pygame.draw.rect(win, color, (self.x, self.y, self.size, self.size), BORDER_SIZE)
 
     def mark(self, win, mark, color):

@@ -3,7 +3,8 @@ import pygame
 
 class Button:
     def __init__(self, x, y, width, height):
-        self.color = BGCOLOR
+        self.color = BUTTON_COLOR
+        self.corner = 5
         self.height = height
         self.width = width
         self.x = x
@@ -19,7 +20,7 @@ class Button:
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
-        pygame.draw.rect(win, (0, 0, 0), (self.x, self.y, self.width, self.height), 1, 5)
+        pygame.draw.rect(win, BLACK, (self.x, self.y, self.width, self.height), 1, self.corner)
 
     def write(self, win, string, color):
         font = pygame.font.SysFont("comicsans", self.height)

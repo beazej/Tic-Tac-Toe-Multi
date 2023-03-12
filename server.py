@@ -19,11 +19,11 @@ print("Waiting for a connection, Server Started")
 
 connected = set()
 games = {}
-idCount = 0
+id_count = 0
 
 
 def threaded_client(conn, p, gameId):
-    global idCount
+    global id_count
     conn.send(str.encode(str(p)))
 
     reply = ""
@@ -31,8 +31,8 @@ def threaded_client(conn, p, gameId):
         try:
             data = conn.recv(4096).decode()
 
-            if gameId in games:
-                game = games[gameId]
+            if game_id in games:
+                game = games[game_id]
 
                 if not data:
                     break
@@ -42,7 +42,7 @@ def threaded_client(conn, p, gameId):
                     elif data == "continue":
                         game.continues[p] = True
                     elif data == "resetContinue":
-                        game.resetContinue()
+                        game.reset_continue()
                     elif data == "tie":
                         game.ties += 1
                     elif data == "win":
@@ -53,7 +53,7 @@ def threaded_client(conn, p, gameId):
                         game.choose[p] = False
                     elif data != "get":
                         if data[0] == 'C':
-                            game.setColor(p, data[1:])
+                            game.set_color(p, data[1:])
                         elif data[0] == 'M':
                             game.marks[p] = data[1]
                         else:
@@ -67,11 +67,11 @@ def threaded_client(conn, p, gameId):
 
     print("Lost connection")
     try:
-        del games[gameId]
-        print("Closing Game", gameId)
+        del games[game_id]
+        print("Closing Game", game_id)
     except:
         pass
-    idCount -= 1
+    id_count -= 1
     conn.close()
 
 
@@ -80,15 +80,15 @@ while True:
     conn, addr = s.accept()
     print("Connected to:", addr)
 
-    idCount += 1
+    id_count += 1
     p = 0
-    gameId = (idCount - 1)//2
-    if idCount % 2 == 1:
-        games[gameId] = Game(gameId)
+    game_id = (id_count - 1)//2
+    if id_count % 2 == 1:
+        games[game_id] = Game(game_id)
         print("Creating a new game...")
     else:
-        games[gameId].ready = True
+        games[game_id].ready = True
         p = 1
 
 
-    start_new_thread(threaded_client, (conn, p, gameId))
+    start_new_thread(threaded_client, (conn, p, game_id))

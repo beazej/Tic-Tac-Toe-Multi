@@ -7,6 +7,17 @@ Python 3 oraz biblioteka Pygame.
 Jest to gra online, korzystająca z struktury klient-serwer.
 Na ten moment jest to wersja z małą planszą dla dwóch graczy.
 
+### Pliki
+Podstawowymi plikami są:
+- *server.py*, służący do uruchomienia serwera,
+- *client.py*, służacy do uruchomienia klienta.
+Poza nimi są też:
+- *game.py*, zawierający klasę Game przechowującą dane potrzebne do wymiany między serwerem a klientem,
+- *network.py*, zawierajacy klasę Network, potrzebną do zbudowania sieci,
+- *settings.py*, zawierający stałe potrzebne do zbudowania połączenia,
+- *constants.py*, zawierające stałe dla graficznej części gry,
+- *button.py*, *square_button.py* i *slider.py*, zawierające klasy elementów gry.
+
 ### Instrukcja
 ```
 python3 server.py
